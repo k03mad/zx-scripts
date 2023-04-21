@@ -16,9 +16,16 @@ const [ps, config] = await Promise.all([
 const [, ...procSplit] = ps.stdout.split('\n');
 
 const procExec = procSplit
-    .map(elem => elem.split(/ +/).slice(COMMAND_COLUMN)[0])
-    .filter(elem => elem && COMMAND_FILTER.test(elem))
-    .map(elem => elem.split('/').at(-1).replace(COMMAND_REMOVE_CHARS, ''));
+    .map(elem => {
+        const command = elem.split(/ +/).slice(COMMAND_COLUMN)[0];
+
+        if (command && COMMAND_FILTER.test(command)) {
+            return command.split('/').at(-1).replace(COMMAND_REMOVE_CHARS, '');
+        }
+
+        return '';
+    })
+    .filter(Boolean);
 
 const configParsed = YAML.parse(config);
 
